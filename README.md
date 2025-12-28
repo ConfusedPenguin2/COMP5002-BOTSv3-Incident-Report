@@ -30,6 +30,7 @@ To ensure a rigorous investigation, the workflow followed the standard incident 
   <br>
   <em>Figure 1: The NIST SP 800-61 Incident Response Life Cycle (Cichonski et al., 2012).</em>
 </p>
+
 ```mermaid
 graph TD
     A[Start: Alert Triggered] --> B[Input: Suspicious O365 Upload]
