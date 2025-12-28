@@ -30,3 +30,23 @@ To ensure a rigorous investigation, the workflow followed the standard incident 
   <br>
   <em>Figure 1: The NIST SP 800-61 Incident Response Life Cycle (Cichonski et al., 2012).</em>
 </p>
+```mermaid
+graph TD
+    A[Start: Alert Triggered] --> B[Input: Suspicious O365 Upload]
+    B --> C[Phase 1: Triage & Verify]
+    C --> D{False Positive?}
+    D -- Yes --> E[Close Ticket]
+    D -- No --> F[Phase 2: Scope & Correlate]
+    F -->|Pivot 1| G[Analyze User Agent]
+    F -->|Pivot 2| H[Check Email Logs]
+    F -->|Pivot 3| I[Endpoint Forensics]
+    G --> J[Finding: North Korean UA]
+    H --> K[Finding: .xlsm Attachment]
+    I --> L[Finding: HxTsr.exe & Port 1337]
+    J --> M[Phase 3: Containment Strategy]
+    K --> M
+    L --> M
+    M --> N[Block IPs & hashes]
+    M --> O[Isolate Host FYODOR-L]
+```
+*Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.*
