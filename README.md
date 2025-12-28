@@ -23,10 +23,10 @@ Provide strategic recommendations to elevate the SOC from a reactive to a proact
 
 # 2.0 SOC Roles & Incident Handling Reflection
 This section critically reflects on the SOC methodologies applied, demonstrating an understanding of industry standards and the operational hierarchy required for effective incident response.
+## 2.1 Investigative Workflow
+To ensure a rigorous investigation, the workflow followed the standard incident response lifecycle. The diagram below illustrates the decision-making process used during this assessment.
 <p align="center">
   <img src="Figure1NIST.png" width="70%">
   <br>
   <em>Figure 1: The NIST SP 800-61 Incident Response Life Cycle (Cichonski et al., 2012).</em>
 </p>
-## 2.1 Investigative Workflow
-To ensure a rigorous investigation, the workflow followed the standard incident response lifecycle. The diagram below illustrates the decision-making process used during this assessment.
