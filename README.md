@@ -20,3 +20,8 @@ Map the attack lifecycle to the Cyber Kill Chain.
 Identify Indicators of Compromise (IOCs) including malicious hashes, C2 IPs, and User Agents.
 
 Provide strategic recommendations to elevate the SOC from a reactive to a proactive posture.
+
+# 2.0 SOC Roles & Incident Handling Reflection
+This section critically reflects on the SOC methodologies applied, demonstrating an understanding of industry standards and the operational hierarchy required for effective incident response.
+## 2.1 Investigative Workflow
+To ensure a rigorous investigation, the workflow followed the standard incident response lifecycle. The diagram below illustrates the decision-making process used during this assessment.
