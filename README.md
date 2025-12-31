@@ -58,7 +58,7 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
 * **Threat Hunting:** Proactively searching for "unknown unknowns," such as the anomalous User Agent string identified in Question 1, which had not triggered a default alert.
 
 <p align="center">
-  <img src="killchain.png" width="70%">
+  <img src="killchain.png" width="590%">
   <br>
   <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
 </p>
@@ -72,8 +72,6 @@ A critical part of Tier 2 analysis is understanding visibility gaps. The followi
 | **Exploitation** | `WinEventLog:Security` | **Low** | Standard Windows logs failed to show the *method* of exploitation (Macro execution). |
 | **Installation** | `Sysmon` | **Critical** | Essential for linking the Excel process to the dropped binary `HxTsr.exe`. Without Sysmon, attribution would be impossible. |
 | **C2** | `Osquery` | **High** | Provided granular visibility into specific ports (1337) and process bindings on Linux, superior to standard netstat logs. |
-
----
 
 ## 3.0 Installation & Data Preparation
 *Analyst Note: This section validates the integrity of the forensic environment.*
