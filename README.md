@@ -51,3 +51,35 @@ graph TD
     M --> O[Isolate Host FYODOR-L]
 ```
 *Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.*
+## 2.2 The Role of the Tier 2 Analyst
+In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on triage and alert validation, this report reflects **Tier 2/3 Analysis**. This role requires:
+* **Correlation:** Moving beyond single-event alerts to correlate disparate data sources (e.g., Cloud O365 logs vs. Endpoint Sysmon logs).
+* **Contextualization:** Understanding the business impact of the assets involved (e.g., Finance Department documents).
+* **Threat Hunting:** Proactively searching for "unknown unknowns," such as the anomalous User Agent string identified in Question 1, which had not triggered a default alert.
+
+<p align="center">
+  <img src="killchain.png" width="60%">
+  <br>
+  <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
+</p>
+
+### 2.3 Data Source Efficacy Mapping
+A critical part of Tier 2 analysis is understanding visibility gaps. The following table maps the BOTSv3 data sources to the attack phases, highlighting the necessity of advanced telemetry.
+
+| Kill Chain Phase | Primary Data Source | Efficacy | Analyst Note |
+| :--- | :--- | :--- | :--- |
+| **Delivery** | `stream:smtp` | **High** | Full visibility into sender, subject, and attachment names allowed for rapid identification of the phishing vector. |
+| **Exploitation** | `WinEventLog:Security` | **Low** | Standard Windows logs failed to show the *method* of exploitation (Macro execution). |
+| **Installation** | `Sysmon` | **Critical** | Essential for linking the Excel process to the dropped binary `HxTsr.exe`. Without Sysmon, attribution would be impossible. |
+| **C2** | `Osquery` | **High** | Provided granular visibility into specific ports (1337) and process bindings on Linux, superior to standard netstat logs. |
+
+---
+
+## 3.0 Installation & Data Preparation
+*Analyst Note: This section validates the integrity of the forensic environment.*
+
+### 3.1 Infrastructure Configuration
+The investigation was conducted on a localized Splunk Enterprise instance hosted on an Ubuntu 20.04 Virtual Machine.
+
+* **Ingestion Strategy:** The BOTSv3 dataset [4] was ingested using the standard Splunk "Add Data" workflow. Special attention was paid to the `sourcetype` configuration to ensure correct field extraction. For instance, ensuring `xmlwineventlog:microsoft-windows-sysmon/operational` was correctly parsed was critical for extracting the MD5 hashes required in Question 8.
+* **Validation:** A baseline query `index=botsv3 | stats count by sourcetype` was executed to verify that log volume matched expected parameters (approx. X million events), ensuring no data loss occurred during ingestion.
