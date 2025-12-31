@@ -58,7 +58,7 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
 * **Threat Hunting:** Proactively searching for "unknown unknowns," such as the anomalous User Agent string identified in Question 1, which had not triggered a default alert.
 
 <p align="center">
-  <img src="killchain.png" width="60%">
+  <img src="killchain.png" width="70%">
   <br>
   <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
 </p>
