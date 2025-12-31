@@ -8,18 +8,14 @@ This forensic report details a comprehensive investigation into a security incid
 
 Utilizing the "Boss of the SOC v3" (BOTSv3) dataset, the analysis focused on logs from stream:smtp, WinEventLog:Security, Sysmon, and Osquery. The investigation confirmed a successful spear-phishing campaign that resulted in initial access, privilege escalation, and lateral movement. The adversary successfully established persistence on both Windows and Linux infrastructure, exposing critical deficiencies in Frothly's detection capabilities.
 
-## 1.2 Scope and Objectives
-The primary goal of this engagement was to conduct a root-cause analysis (RCA) adhering to the NIST SP 800-61 framework.
+### 1.2 Scope and Objectives
+The primary goal of this engagement was to conduct a root-cause analysis (RCA) adhering to the **NIST SP 800-61** framework.
 
-Scope: The investigation encompassed the hybrid environment, specifically User Activity on Office 365 (OneDrive), Endpoint Execution on Windows (FYODOR-L), and Linux Server Administration (hoth).
-
-Objectives:
-
-Map the attack lifecycle to the Cyber Kill Chain.
-
-Identify Indicators of Compromise (IOCs) including malicious hashes, C2 IPs, and User Agents.
-
-Provide strategic recommendations to elevate the SOC from a reactive to a proactive posture.
+* **Scope:** The investigation encompassed the hybrid environment, specifically User Activity on Office 365 (OneDrive), Endpoint Execution on Windows (FYODOR-L), and Linux Server Administration (hoth).
+* **Objectives:**
+    * Map the attack lifecycle to the **Cyber Kill Chain**.
+    * Identify Indicators of Compromise (IOCs) including malicious hashes, C2 IPs, and User Agents.
+    * Provide strategic recommendations to elevate the SOC from a reactive to a proactive posture.
 
 # 2.0 SOC Roles & Incident Handling Reflection
 This section critically reflects on the SOC methodologies applied, demonstrating an understanding of industry standards and the operational hierarchy required for effective incident response.
@@ -60,7 +56,9 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
 <p align="center">
   <img src="killchain.png" width="590%">
   <br>
-  <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
+  <p align="center">
+  <em>Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.</em>
+</p>
 </p>
 
 ### 2.3 Data Source Efficacy Mapping
