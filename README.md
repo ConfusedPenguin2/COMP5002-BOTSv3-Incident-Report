@@ -46,7 +46,9 @@ graph TD
     M --> N[Block IPs & hashes]
     M --> O[Isolate Host FYODOR-L]
 ```
-*Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.*
+<p align="center">
+  <em>Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.</em>
+</p>
 ## 2.2 The Role of the Tier 2 Analyst
 In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on triage and alert validation, this report reflects **Tier 2/3 Analysis**. This role requires:
 * **Correlation:** Moving beyond single-event alerts to correlate disparate data sources (e.g., Cloud O365 logs vs. Endpoint Sysmon logs).
@@ -57,7 +59,7 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
   <img src="killchain.png" width="590%">
   <br>
   <p align="center">
-  <em>Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.</em>
+  <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
 </p>
 </p>
 
