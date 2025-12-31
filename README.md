@@ -49,12 +49,13 @@ graph TD
 <p align="center">
   <em>Figure 2: The decision-making logic applied during this investigation, ensuring valid triage before escalation.</em>
 </p>
+
 ## 2.2 The Role of the Tier 2 Analyst
 In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on triage and alert validation, this report reflects **Tier 2/3 Analysis**. This role requires:
+
 * **Correlation:** Moving beyond single-event alerts to correlate disparate data sources (e.g., Cloud O365 logs vs. Endpoint Sysmon logs).
 * **Contextualization:** Understanding the business impact of the assets involved (e.g., Finance Department documents).
 * **Threat Hunting:** Proactively searching for "unknown unknowns," such as the anomalous User Agent string identified in Question 1, which had not triggered a default alert.
-
 <p align="center">
   <img src="killchain.png" width="590%">
   <br>
