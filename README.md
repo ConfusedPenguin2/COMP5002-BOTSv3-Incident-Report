@@ -127,7 +127,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 
 **Evidence:**
 <p align="center">
-  <img src="2.2.png" width="90%">
+  <img src="2.2.jpg" width="90%">
   <br>
   <em>Figure 6: SMTP logs capturing the delivery of the malicious financial document.</em>
 </p>
