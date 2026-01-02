@@ -140,14 +140,16 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **SOC & Strategic Reflection:** The Email Secure Gateway (ESG) failed to quarantine this file. This suggests that the organization relies on signature-based detection (which this file bypassed) rather than heuristic analysis (which would have flagged the macro).
     * **Operational Recommendation:** Configure the Email Gateway to "Disarm" active content (CDR) or strictly block `.xlsm` attachments from external senders.
 
- ### Phase 1: Installation & Exploitation (Endpoint Execution)
+ ### Phase 2: Installation & Exploitation (Endpoint Execution)
  Once delivered, the attacker relied on user interaction to execute the payload.
 
  ### Incident 3: Payload Masquerading (Defense Evasion)
 **Context:** Attackers often name their malware identical to legitimate system processes ("Masquerading") to hide in plain sight. This corresponds to MITRE ATT&CK T1036 [5].
+
 * **Question:**  What is the name of the executable that was embedded in the malware?
-*	**Investigative Methodology:**  Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essential here.
-*	 SPL Query: index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"
+  
+*	**Investigative Methodology:**  Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essentia here.
+   * **SPL Query:** index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"
 **Evidence:**
 <p align="center">
   <img src="3.2.jpg" width="90%">
@@ -155,7 +157,9 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
   <em>Figure 7: Sysmon Event ID 1 showing the execution of HxTsr.exe relative to the antivirus log..</em>
 </p>
 
-*	**Analysis & Finding (Q3):** The embedded executable is named: HxTsr.exe
+*	**Analysis & Finding (Q3):** The embedded executable is named:
+> **HxTsr.exe** 
 * **SOC & Strategic Reflection:** HxTsr.exe is a legitimate executable used by Microsoft Outlook. However, in this incident, it likely executed from a Temp directory rather than System32. This discrepancy is the key indicator of compromise.
+  
 *	**Operational Recommendation:** Detection rules must be updated to flag legitimate binaries running from illegitimate paths. This highlights the need for behavioural-based detection rather than simple signature matching.
 
