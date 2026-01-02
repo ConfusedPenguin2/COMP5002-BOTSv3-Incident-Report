@@ -95,3 +95,24 @@ graph LR
     C --> D[4. Persistence<br>Admin User Created]
     D --> E[5. C2 Established<br>Port 1337]
     E --> F[6. Actions on Obj<br>Network Scan]
+#### Incident 2: Phishing Delivery (Social Engineering)
+**Context:** Email remains the primary vector for initial access. The use of "Financial Planning" themes targets high-privilege users in the Finance department, exploiting urgency. Macros (`.xlsm`) are scripts embedded in Office documents that execute code when enabled.
+
+* **Question:** What is the name of the malicious file sent to the user?
+* **Investigative Methodology:** I pivoted to the network stream data, specifically `stream:smtp`, to inspect email metadata. I filtered for attachments with the `.xlsm` extension (Excel Macro-Enabled Workbook) which are commonly used to drop payloads.
+    * **SPL Query:** `index=botsv3 sourcetype="stream:smtp" *.xlsm | table _time, sender, receiver, attach_filename`
+
+**Evidence:**
+<p align="center">
+  <img src="1.2.png" width="90%">
+  <br>
+  <em>Figure 6: SMTP logs capturing the delivery of the malicious financial document.</em>
+</p>
+
+* **Analysis & Finding (Q2):** The logs confirm the delivery of a file named:
+    > **Frothly-Brewery-Financial-Planning-FY2019-Draft.xlsm**
+    
+    The file was successfully delivered to the user's inbox at **09:55:23**.
+
+* **SOC & Strategic Reflection:** The Email Secure Gateway (ESG) failed to quarantine this file. This suggests that the organization relies on signature-based detection (which this file bypassed) rather than heuristic analysis (which would have flagged the macro).
+    * **Operational Recommendation:** Configure the Email Gateway to "Disarm" active content (CDR) or strictly block `.xlsm` attachments from external senders.
