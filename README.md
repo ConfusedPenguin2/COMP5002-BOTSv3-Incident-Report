@@ -149,7 +149,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **Question:**  What is the name of the executable that was embedded in the malware?
   
 *	**Investigative Methodology:**  Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essentia here.
-   * **SPL Query:** index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"
+   * **SPL Query:** 'index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"'
 **Evidence:**
 <p align="center">
   <img src="3.2.jpg" width="90%">
