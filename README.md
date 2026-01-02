@@ -82,3 +82,16 @@ The investigation was conducted on a localized Splunk Enterprise instance hosted
 
 * **Ingestion Strategy:** The BOTSv3 dataset [4] was ingested using the standard Splunk "Add Data" workflow. Special attention was paid to the `sourcetype` configuration to ensure correct field extraction. For instance, ensuring `xmlwineventlog:microsoft-windows-sysmon/operational` was correctly parsed was critical for extracting the MD5 hashes required in Question 8.
 * **Validation:** A baseline query `index=botsv3 | stats count by sourcetype` was executed to verify that log volume matched expected parameters (approx. X million events), ensuring no data loss occurred during ingestion.
+
+## 4.0 Guided Questions: Comprehensive Incident Analysis
+
+### Reconstructed Attack Timeline
+Before detailing individual findings, the following timeline reconstructs the adversary's path through the network, providing context for the individual alerts.
+
+```mermaid
+graph LR
+    A[1. Delivery<br>Phishing Email] --> B[2. Exploitation<br>Macro Excel]
+    B --> C[3. Installation<br>HxTsr.exe Dropped]
+    C --> D[4. Persistence<br>Admin User Created]
+    D --> E[5. C2 Established<br>Port 1337]
+    E --> F[6. Actions on Obj<br>Network Scan]
