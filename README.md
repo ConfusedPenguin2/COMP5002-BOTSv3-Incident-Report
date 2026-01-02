@@ -96,6 +96,28 @@ graph LR
     D --> E[5. C2 Established<br>Port 1337]
     E --> F[6. Actions on Obj<br>Network Scan]
 ```
+### Phase 1: Weaponization & Delivery (Cloud & Email Vectors)
+The attack commenced with reconnaissance and staging of malware on trusted cloud platforms to bypass reputation-based filtering.
+
+#### Incident 1: OneDrive Malicious Upload (Cloud Staging)
+**Context:** Attackers increasingly use legitimate cloud storage (OneDrive, Dropbox) to host malware because these domains are rarely blocked by corporate firewalls. This "Living off the Land" technique complicates attribution.
+
+* **Question:** What is the full user agent string that uploaded the malicious link file to OneDrive?
+* **Investigative Methodology:** The investigation focused on the `ms:o365:management` sourcetype. I filtered for `Workload="OneDrive"` and the operation `FileUploaded`. The key to isolating the threat was correlating the upload with the client metadata to identify User Agents deviating from the corporate standard.
+    * **SPL Query:** `index=botsv3 sourcetype="ms:o365:management" Workload="OneDrive" Operation="FileUploaded" | table time, src_ip, user, object, UserAgent`
+
+**Evidence:**
+<p align="center">
+  <img src="1.2.png" width="90%">
+  <br>
+  <em>Figure 5: Splunk search results confirming the upload from a suspicious User Agent.</em>
+</p>
+
+* **Analysis & Finding (Q1):** The uploaded file was a malicious shortcut (`.lnk`). The User Agent string identified is:
+> **Mozilla/5.0 (X11; U; Linux i686; ko-KP; rv: 19.1br) Gecko/20130508 Fedora/1.9.1-2.5.rs3.0 NaenaraBrowser/3.5b4**
+
+* **SOC & Strategic Reflection:** The presence of `NaenaraBrowser` (North Korean intranet software) and the `ko-KP` language code is a critical indicator of a nation-state actor or a sophisticated decoy. In a standard SOC, this finding represents a failure in **User Behavior Analytics (UBA)**.
+    * **Operational Recommendation:** Create a Splunk correlation search to alert on any User Agent string that appears less than 5 times in a 30-day window ("Rare Analysis").
 #### Incident 2: Phishing Delivery (Social Engineering)
 **Context:** Email remains the primary vector for initial access. The use of "Financial Planning" themes targets high-privilege users in the Finance department, exploiting urgency. Macros (`.xlsm`) are scripts embedded in Office documents that execute code when enabled.
 
@@ -105,7 +127,7 @@ graph LR
 
 **Evidence:**
 <p align="center">
-  <img src="1.2.png" width="90%">
+  <img src="2.2.png" width="90%">
   <br>
   <em>Figure 6: SMTP logs capturing the delivery of the malicious financial document.</em>
 </p>
