@@ -95,6 +95,7 @@ graph LR
     C --> D[4. Persistence<br>Admin User Created]
     D --> E[5. C2 Established<br>Port 1337]
     E --> F[6. Actions on Obj<br>Network Scan]
+```
 #### Incident 2: Phishing Delivery (Social Engineering)
 **Context:** Email remains the primary vector for initial access. The use of "Financial Planning" themes targets high-privilege users in the Finance department, exploiting urgency. Macros (`.xlsm`) are scripts embedded in Office documents that execute code when enabled.
 
