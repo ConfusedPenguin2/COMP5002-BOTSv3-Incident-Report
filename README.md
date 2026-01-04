@@ -263,3 +263,45 @@ To demonstrate strategic improvement, the following table compares Frothly's cur
 | **Endpoint Protection** | Reactive. Relied on antivirus signatures (Symantec). | **Proactive.** Enforce AppLocker (Allowlist) to block unsigned binaries like `hdoor.exe` in Temp folders. |
 | **Identity Management** | Local Admin accounts (`svcvnc`) created without alerts. | **Just-In-Time (JIT) Admin Access.** Any local admin creation triggers a P1 SOC alert. |
 | **Network Visibility** | Flat network. Workstations scanned servers (192.168.X.X). | **Micro-segmentation.** Workstations should be isolated from Server VLANs using Zero Trust ACLs [6]. |
+
+### 5.3 Strategic Recommendations (People, Process, Technology)
+To elevate Frothly's security posture from "Reactive" to "Adaptive", the following strategic initiatives are recommended:
+
+#### I. Technology: Attack Surface Reduction (ASR)
+The investigation confirmed that the initial compromise relied on Office macros spawning child processes.
+* **Immediate Action:** Enable Microsoft Attack Surface Reduction (ASR) Rule: *Block all Office applications from creating child processes* [7]. This single configuration would have neutralized the `excel.exe` -> `HxTsr.exe` execution chain, effectively killing the attack at Phase 2.
+* **Secondary Action:** Implement AppLocker policies to block execution of unapproved binaries in world-writable directories (`C:\Windows\Temp`).
+
+#### II. Process: Risk-Based Alerting (RBA)
+The SOC was flooded with individual alerts, delaying the detection of the "Low and Slow" scan.
+* **Strategic Shift:** Move from "Atomic Alerting" to Risk-Based Alerting (RBA) within Splunk.
+* **Implementation:** Instead of alerting on every "Process Creation," assign risk scores to specific behaviors (e.g., Netcat execution = *Risk: 40*, Port 1337 = *Risk: 30*, Temp Folder Execution = *Risk: 30*). An alert triggers only when the aggregate risk score for a host exceeds 80.
+
+#### III. People: Threat Hunting & OpSec
+The presence of a North Korean User Agent (`NaenaraBrowser`) went unnoticed until deep analysis.
+* **Recommendation:** Formalize a Tier 3 Threat Hunting rotation. Analysts should dedicate 20% of their time to proactively searching for "outlier" data (e.g., User Agents with <1% prevalence) rather than simply closing tickets.
+
+<p align="center">
+  <img src="pyramid.png" width="60%">
+  <br>
+  <em>Figure 14: The Pyramid of Pain (Bianco, 2013)</em>
+</p>
+
+---
+
+## 6.0 References
+[1] P. Cichonski, T. Millar, T. Grance, and K. Scarfone, *Computer Security Incident Handling Guide*, NIST Special Publication 800-61 Rev. 2. Gaithersburg: U.S. Department of Commerce, 2012.
+
+[2] ISO/IEC, *Information technology — Security techniques — Information security incident management — Part 1: Principles of incident management*, ISO/IEC 27035-1:2016, 2016.
+
+[3] E. Hutchins, M. Cloppert, and R. Amin, "Intelligence-Driven Computer Network Defense Informed by Analysis of Adversary Campaigns and Intrusion Kill Chains," *Leading Issues in Information Warfare & Security Research*, vol. 1, no. 1, pp. 80-106, 2011.
+
+[4] Splunk Inc., "Boss of the SOC (BOTS) Version 3 Dataset," GitHub Repository, 2020. [Online]. Available: https://github.com/splunk/botsv3. [Accessed: 27-Dec-2025].
+
+[5] MITRE Corp., "MITRE ATT&CK Framework," *attack.mitre.org*, 2023. [Online]. Available: https://attack.mitre.org. [Accessed: 27-Dec-2025].
+
+[6] S. Rose, O. Borchert, S. Mitchell, and S. Connelly, *Zero Trust Architecture*, NIST Special Publication 800-207. Gaithersburg, MD: National Institute of Standards and Technology, 2020.
+
+[7] Microsoft, "Attack surface reduction rules reference," *Microsoft Learn*, 2023. [Online]. Available: https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/attack-surface-reduction-rules-reference. [Accessed: 27-Dec-2025].
+
+[8] D. Bianco, "The Pyramid of Pain," *Enterprise Detection & Response*, 2013. [Online]. Available: http://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html. [Accessed: 27-Dec-2025].
