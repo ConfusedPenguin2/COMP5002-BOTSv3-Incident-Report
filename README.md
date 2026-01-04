@@ -163,3 +163,20 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
   
 *	**Operational Recommendation:** Detection rules must be updated to flag legitimate binaries running from illegitimate paths. This highlights the need for behavioural-based detection rather than simple signature matching.
 
+### Incident 4: Linux Privilege Escalation (Credential Theft)
+**Context:** The attack also targeted Linux infrastructure (hoth). The use of useradd indicates an attempt to establish a persistent backdoor.
+* **Question:**  What is the password for the user that was successfully created by the user "root"?  
+*	**Investigative Methodology:**  I utilized Osquery logs, which provide deep visibility into Linux system state. I searched for the useradd command within the cmdline field, which captures the exact text typed by the attacker.
+   * **SPL Query:** 'index=botsv3 sourcetype="osquery:results" name="process_events" columns.cmdline="*useradd*"'
+**Evidence:**
+<p align="center">
+  <img src="4.2.jpg" width="90%">
+  <br>
+  <em>Figure 8: Osquery results showing the creation of the backdoor user tomcat7..</em>
+</p>
+
+*	**Analysis & Finding (Q3):** The command exposed the password:
+> ** ilovedavidverve ** 
+* **SOC & Strategic Reflection:** The capture of cleartext passwords in logs is a critical vulnerability. Operational security (OpSec) requires administrators to avoid passing secrets as command-line arguments.
+  
+*	**Operational Recommendation:** We must sanitize auditd and Osquery configs to redact these fields to prevent sensitive data leakage. This is a critical compliance failure.
