@@ -140,65 +140,69 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **SOC & Strategic Reflection:** The Email Secure Gateway (ESG) failed to quarantine this file. This suggests that the organization relies on signature-based detection (which this file bypassed) rather than heuristic analysis (which would have flagged the macro).
     * **Operational Recommendation:** Configure the Email Gateway to "Disarm" active content (CDR) or strictly block `.xlsm` attachments from external senders.
 
- ### Phase 2: Installation & Exploitation (Endpoint Execution)
- Once delivered, the attacker relied on user interaction to execute the payload.
+### Phase 2: Installation & Exploitation (Endpoint Execution)
+Once delivered, the attacker relied on user interaction to execute the payload.
 
- ### Incident 3: Payload Masquerading (Defense Evasion)
+#### Incident 3: Payload Masquerading (Defense Evasion)
 **Context:** Attackers often name their malware identical to legitimate system processes ("Masquerading") to hide in plain sight. This corresponds to MITRE ATT&CK T1036 [5].
 
-* **Question:**  What is the name of the executable that was embedded in the malware?
-  
-*	**Investigative Methodology:**  Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essentia here.
-   * **SPL Query:** 'index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"'
+* **Question:** What is the name of the executable that was embedded in the malware?
+* **Investigative Methodology:** Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essential here.
+    * **SPL Query:** `index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 | search ParentImage="*excel.exe"`
+
 **Evidence:**
 <p align="center">
   <img src="3.2.jpg" width="90%">
   <br>
-  <em>Figure 7: Sysmon Event ID 1 showing the execution of HxTsr.exe relative to the antivirus log..</em>
+  <em>Figure 7: Sysmon Event ID 1 showing the execution of HxTsr.exe relative to the antivirus log.</em>
 </p>
 
-*	**Analysis & Finding (Q3):** The embedded executable is named:
-> **HxTsr.exe** 
-* **SOC & Strategic Reflection:** HxTsr.exe is a legitimate executable used by Microsoft Outlook. However, in this incident, it likely executed from a Temp directory rather than System32. This discrepancy is the key indicator of compromise.
-  
-*	**Operational Recommendation:** Detection rules must be updated to flag legitimate binaries running from illegitimate paths. This highlights the need for behavioural-based detection rather than simple signature matching.
+* **Analysis & Finding (Q3):** The embedded executable is named:
+> **HxTsr.exe**
 
-### Incident 4: Linux Privilege Escalation (Credential Theft)
-**Context:** The attack also targeted Linux infrastructure (hoth). The use of useradd indicates an attempt to establish a persistent backdoor.
-* **Question:**  What is the password for the user that was successfully created by the user "root"?  
-*	**Investigative Methodology:**  I utilized Osquery logs, which provide deep visibility into Linux system state. I searched for the useradd command within the cmdline field, which captures the exact text typed by the attacker.
-   * **SPL Query:** 'index=botsv3 sourcetype="osquery:results" name="process_events" columns.cmdline="*useradd*"'
+* **SOC & Strategic Reflection:** `HxTsr.exe` is a legitimate executable used by Microsoft Outlook. However, in this incident, it likely executed from a Temp directory rather than System32. This discrepancy is the key indicator of compromise.
+    * **Operational Recommendation:** Detection rules must be updated to flag legitimate binaries running from illegitimate paths. This highlights the need for **Behavioral-Based Detection**.
+
+#### Incident 4: Linux Privilege Escalation (Credential Theft)
+**Context:** The attack also targeted Linux infrastructure (hoth). The use of `useradd` indicates an attempt to establish a persistent backdoor.
+
+* **Question:** What is the password for the user that was successfully created by the user "root"?
+* **Investigative Methodology:** I utilized Osquery logs, which provide deep visibility into Linux system state. I searched for the `useradd` command within the `cmdline` field, which captures the exact text typed by the attacker.
+    * **SPL Query:** `index=botsv3 sourcetype="osquery:results" name="process_events" columns.cmdline="*useradd*"`
+
 **Evidence:**
 <p align="center">
   <img src="4.2.jpg" width="90%">
   <br>
-  <em>Figure 8: Osquery results showing the creation of the backdoor user tomcat7..</em>
+  <em>Figure 8: Osquery results showing the creation of the backdoor user tomcat7.</em>
 </p>
 
-*	**Analysis & Finding (Q3):** The command exposed the password:
-> ** ilovedavidverve ** 
-* **SOC & Strategic Reflection:** The capture of cleartext passwords in logs is a critical vulnerability. Operational security (OpSec) requires administrators to avoid passing secrets as command-line arguments.
-  
-*	**Operational Recommendation:** We must sanitize auditd and Osquery configs to redact these fields to prevent sensitive data leakage. This is a critical compliance failure.
+* **Analysis & Finding (Q4):** The command exposed the password:
+> **ilovedavidverve**
 
-### Incident 5 & 6: Windows Persistence (Account Creation)
+* **SOC & Strategic Reflection:** The capture of cleartext passwords in logs is a critical vulnerability. Operational security (OpSec) requires administrators to avoid passing secrets as command-line arguments.
+    * **Operational Recommendation:** We must sanitize `auditd` and `Osquery` configs to redact these fields to prevent sensitive data leakage. This is a critical compliance failure.
+
+#### Incident 5 & 6: Windows Persistence (Account Creation)
 **Context:** Creating a local user account provides "Persistence" (MITRE T1136) [5]. Even if the malware process is killed, the attacker can log back in using these credentials.
-* **Question:**  What is the name of the user created, and what groups were they assigned to? 
-*	**Investigative Methodology:**  I queried WinEventLog:Security for Event Code 4720 (User Created) and 4732 (Member Added to Security-Enabled Local Group). This two-step correlation is vital to understand the privilege level of the new account.
-   * **SPL Query:** 'index=botsv3 sourcetype="WinEventLog:Security" (EventCode=4720 OR EventCode=4732)'
+
+* **Question:** What is the name of the user created, and what groups were they assigned to?
+* **Investigative Methodology:** I queried `WinEventLog:Security` for Event Code 4720 (User Created) and 4732 (Member Added to Security-Enabled Local Group). This two-step correlation is vital to understand the privilege level of the new account.
+    * **SPL Query:** `index=botsv3 sourcetype="WinEventLog:Security" (EventCode=4720 OR EventCode=4732)`
+
 **Evidence:**
 <p align="center">
   <img src="5.2.jpg" width="90%">
   <br>
-  <em>Figure 8: Windows Security logs confirming the creation of the local svcvnc account.</em>
+  <em>Figure 9: Windows Security logs confirming the creation of the local svcvnc account.</em>
 </p>
 
-*	**Analysis & Finding :** 
-> ** User: svcvnc** 
-> ** Groups: Administrators, Users** 
-* **SOC & Strategic Reflection:** The username svcvnc strongly implies the installation of VNC (Virtual Network Computing) remote desktop software. Adding this user to "Administrators" grants total control.
-  
-*	**Operational Recommendation:** Implement a "Zero Trust" policy where local admin account creation triggers an automatic P1 alert to the SOC [6]. This activity should be blocked by Group Policy Object (GPO).
+* **Analysis & Finding (Q5/Q6):**
+> **User:** svcvnc
+> **Groups:** Administrators, Users
+
+* **SOC & Strategic Reflection:** The username `svcvnc` strongly implies the installation of VNC (Virtual Network Computing) remote desktop software. Adding this user to "Administrators" grants total control.
+    * **Operational Recommendation:** Implement a "Zero Trust" policy where local admin account creation triggers an automatic P1 alert to the SOC [6]. This activity should be blocked by Group Policy Object (GPO).
 
   ### Phase 3: Actions on Objectives (C2 & Lateral Movement)
 In the final phase, the attacker utilized their access to scan the network and establish Command and Control (C2).
@@ -223,7 +227,7 @@ In the final phase, the attacker utilized their access to scan the network and e
     * **Operational Recommendation:** Firewall rules must be audited to ensure a "Default Deny" policy for ingress/egress traffic on non-standard ports.
 
 #### Incident 8: Internal Reconnaissance (Scanning)
-**Context:** Once inside, attackers "map" the network to find servers with valuable data (e.g., SQL databases). This corresponds to MITRE ATT&CK T1046 (Network Service Scanning) [5].
+> **Context:** Once inside, attackers "map" the network to find servers with valuable data (e.g., SQL databases). This corresponds to MITRE ATT&CK T1046 (Network Service Scanning) [5].
 
 * **Question:** What is the MD5 value of the file used to scan Frothly's network?
 * **Investigative Methodology:** I returned to Sysmon Event ID 1 logs, looking for processes executing from suspicious directories (Temp) with network arguments. Sysmon automatically calculates the hash of every executed process.
@@ -282,7 +286,7 @@ The presence of a North Korean User Agent (`NaenaraBrowser`) went unnoticed unti
 * **Recommendation:** Formalize a Tier 3 Threat Hunting rotation. Analysts should dedicate 20% of their time to proactively searching for "outlier" data (e.g., User Agents with <1% prevalence) rather than simply closing tickets.
 
 <p align="center">
-  <img src="pyramid.png" width="60%">
+  <img src="pyramid.jpg" width="60%">
   <br>
   <em>Figure 14: The Pyramid of Pain (Bianco, 2013)</em>
 </p>
