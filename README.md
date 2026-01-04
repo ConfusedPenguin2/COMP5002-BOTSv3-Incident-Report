@@ -66,7 +66,7 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
 ### 2.3 Data Source Efficacy Mapping
 A critical part of Tier 2 analysis is understanding visibility gaps. The following table maps the BOTSv3 data sources to the attack phases, highlighting the necessity of advanced telemetry.
 
-| Kill Chain Phase | Primary Data Source | Efficacy | Analyst Note |
+| **Kill Chain Phase** | **Primary Data Source** | **Efficacy** | **Analyst Note** |
 | :--- | :--- | :--- | :--- |
 | **Delivery** | `stream:smtp` | **High** | Full visibility into sender, subject, and attachment names allowed for rapid identification of the phishing vector. |
 | **Exploitation** | `WinEventLog:Security` | **Low** | Standard Windows logs failed to show the *method* of exploitation (Macro execution). |
@@ -99,7 +99,7 @@ graph LR
 The attack commenced with reconnaissance and staging of malware on trusted cloud platforms to bypass reputation-based filtering.
 
 #### Incident 1: OneDrive Malicious Upload (Cloud Staging)
-**Context:** Attackers increasingly use legitimate cloud storage (OneDrive, Dropbox) to host malware because these domains are rarely blocked by corporate firewalls. This "Living off the Land" technique complicates attribution.
+> **Context:** Attackers increasingly use legitimate cloud storage (OneDrive, Dropbox) to host malware because these domains are rarely blocked by corporate firewalls. This "Living off the Land" technique complicates attribution.
 
 * **Question:** What is the full user agent string that uploaded the malicious link file to OneDrive?
 * **Investigative Methodology:** The investigation focused on the `ms:o365:management` sourcetype. I filtered for `Workload="OneDrive"` and the operation `FileUploaded`. The key to isolating the threat was correlating the upload with the client metadata to identify User Agents deviating from the corporate standard.
@@ -118,7 +118,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **SOC & Strategic Reflection:** The presence of `NaenaraBrowser` (North Korean intranet software) and the `ko-KP` language code is a critical indicator of a nation-state actor or a sophisticated decoy. In a standard SOC, this finding represents a failure in **User Behavior Analytics (UBA)**.
     * **Operational Recommendation:** Create a Splunk correlation search to alert on any User Agent string that appears less than 5 times in a 30-day window ("Rare Analysis").
 #### Incident 2: Phishing Delivery (Social Engineering)
-**Context:** Email remains the primary vector for initial access. The use of "Financial Planning" themes targets high-privilege users in the Finance department, exploiting urgency. Macros (`.xlsm`) are scripts embedded in Office documents that execute code when enabled.
+> **Context:** Email remains the primary vector for initial access. The use of "Financial Planning" themes targets high-privilege users in the Finance department, exploiting urgency. Macros (`.xlsm`) are scripts embedded in Office documents that execute code when enabled.
 
 * **Question:** What is the name of the malicious file sent to the user?
 * **Investigative Methodology:** I pivoted to the network stream data, specifically `stream:smtp`, to inspect email metadata. I filtered for attachments with the `.xlsm` extension (Excel Macro-Enabled Workbook) which are commonly used to drop payloads.
@@ -143,7 +143,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 Once delivered, the attacker relied on user interaction to execute the payload.
 
 #### Incident 3: Payload Masquerading (Defense Evasion)
-**Context:** Attackers often name their malware identical to legitimate system processes ("Masquerading") to hide in plain sight. This corresponds to MITRE ATT&CK T1036 [5].
+> **Context:** Attackers often name their malware identical to legitimate system processes ("Masquerading") to hide in plain sight. This corresponds to MITRE ATT&CK T1036 [5].
 
 * **Question:** What is the name of the executable that was embedded in the malware?
 * **Investigative Methodology:** Using Sysmon Event ID 1 (Process Creation), I correlated the time of the Excel document opening with the spawning of child processes. Standard Windows logs (Event 4688) often lack the "ParentImage" field, making Sysmon essential here.
@@ -163,7 +163,7 @@ Once delivered, the attacker relied on user interaction to execute the payload.
     * **Operational Recommendation:** Detection rules must be updated to flag legitimate binaries running from illegitimate paths. This highlights the need for **Behavioral-Based Detection**.
 
 #### Incident 4: Linux Privilege Escalation (Credential Theft)
-**Context:** The attack also targeted Linux infrastructure (hoth). The use of `useradd` indicates an attempt to establish a persistent backdoor.
+> **Context:** The attack also targeted Linux infrastructure (hoth). The use of `useradd` indicates an attempt to establish a persistent backdoor.
 
 * **Question:** What is the password for the user that was successfully created by the user "root"?
 * **Investigative Methodology:** I utilized Osquery logs, which provide deep visibility into Linux system state. I searched for the `useradd` command within the `cmdline` field, which captures the exact text typed by the attacker.
@@ -176,14 +176,14 @@ Once delivered, the attacker relied on user interaction to execute the payload.
   <em>Figure 8: Osquery results showing the creation of the backdoor user tomcat7.</em>
 </p>
 
-* **Analysis & Finding (Q4):** The command exposed the password:
+> * **Analysis & Finding (Q4):** The command exposed the password:
 > **ilovedavidverve**
 
 * **SOC & Strategic Reflection:** The capture of cleartext passwords in logs is a critical vulnerability. Operational security (OpSec) requires administrators to avoid passing secrets as command-line arguments.
     * **Operational Recommendation:** We must sanitize `auditd` and `Osquery` configs to redact these fields to prevent sensitive data leakage. This is a critical compliance failure.
 
 #### Incident 5 & 6: Windows Persistence (Account Creation)
-**Context:** Creating a local user account provides "Persistence" (MITRE T1136) [5]. Even if the malware process is killed, the attacker can log back in using these credentials.
+> **Context:** Creating a local user account provides "Persistence" (MITRE T1136) [5]. Even if the malware process is killed, the attacker can log back in using these credentials.
 
 * **Question:** What is the name of the user created, and what groups were they assigned to?
 * **Investigative Methodology:** I queried `WinEventLog:Security` for Event Code 4720 (User Created) and 4732 (Member Added to Security-Enabled Local Group). This two-step correlation is vital to understand the privilege level of the new account.
@@ -207,7 +207,7 @@ Once delivered, the attacker relied on user interaction to execute the payload.
 In the final phase, the attacker utilized their access to scan the network and establish Command and Control (C2).
 
 #### Incident 7: Command & Control (C2) Channel
-**Context:** C2 channels allow the attacker to send commands to the compromised host. The use of non-standard ports is a common evasion technique.
+> **Context:** C2 channels allow the attacker to send commands to the compromised host. The use of non-standard ports is a common evasion technique.
 
 * **Question:** What is the process ID of the process listening on a "leet" port?
 * **Investigative Methodology:** "Leet" refers to port 1337. I searched Osquery network connection logs for processes binding to this non-standard port.
@@ -260,7 +260,7 @@ To provide a clear path to improvement, we have analyzed the effectiveness of Fr
 ### 5.2 Critical Comparison of Current vs. Target State
 To demonstrate strategic improvement, the following table compares Frothly's current posture against the recommended target state.
 
-| Security Control | Current State (Observed in BOTSv3) | Target State (Strategic Recommendation) |
+|** Security Control | Current State (Observed in BOTSv3) | Target State (Strategic Recommendation) **|
 | :--- | :--- | :--- |
 | **Email Filtering** | Allowed `.xlsm` macros from external sources. | **Block all external macros.** Implement "SafeLinks" to detonate attachments in a sandbox before delivery. |
 | **Endpoint Protection** | Reactive. Relied on antivirus signatures (Symantec). | **Proactive.** Enforce AppLocker (Allowlist) to block unsigned binaries like `hdoor.exe` in Temp folders. |
@@ -270,17 +270,17 @@ To demonstrate strategic improvement, the following table compares Frothly's cur
 ### 5.3 Strategic Recommendations (People, Process, Technology)
 To elevate Frothly's security posture from "Reactive" to "Adaptive", the following strategic initiatives are recommended:
 
-#### I. Technology: Attack Surface Reduction (ASR)
+_#### I. Technology: Attack Surface Reduction (ASR)_
 The investigation confirmed that the initial compromise relied on Office macros spawning child processes.
 * **Immediate Action:** Enable Microsoft Attack Surface Reduction (ASR) Rule: *Block all Office applications from creating child processes* [7]. This single configuration would have neutralized the `excel.exe` -> `HxTsr.exe` execution chain, effectively killing the attack at Phase 2.
 * **Secondary Action:** Implement AppLocker policies to block execution of unapproved binaries in world-writable directories (`C:\Windows\Temp`).
 
-#### II. Process: Risk-Based Alerting (RBA)
+_#### II. Process: Risk-Based Alerting (RBA)_
 The SOC was flooded with individual alerts, delaying the detection of the "Low and Slow" scan.
 * **Strategic Shift:** Move from "Atomic Alerting" to Risk-Based Alerting (RBA) within Splunk.
 * **Implementation:** Instead of alerting on every "Process Creation," assign risk scores to specific behaviors (e.g., Netcat execution = *Risk: 40*, Port 1337 = *Risk: 30*, Temp Folder Execution = *Risk: 30*). An alert triggers only when the aggregate risk score for a host exceeds 80.
 
-#### III. People: Threat Hunting & OpSec
+_#### III. People: Threat Hunting & OpSec_
 The presence of a North Korean User Agent (`NaenaraBrowser`) went unnoticed until deep analysis.
 * **Recommendation:** Formalize a Tier 3 Threat Hunting rotation. Analysts should dedicate 20% of their time to proactively searching for "outlier" data (e.g., User Agents with <1% prevalence) rather than simply closing tickets.
 
