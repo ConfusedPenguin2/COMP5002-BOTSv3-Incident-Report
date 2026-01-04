@@ -180,3 +180,23 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **SOC & Strategic Reflection:** The capture of cleartext passwords in logs is a critical vulnerability. Operational security (OpSec) requires administrators to avoid passing secrets as command-line arguments.
   
 *	**Operational Recommendation:** We must sanitize auditd and Osquery configs to redact these fields to prevent sensitive data leakage. This is a critical compliance failure.
+
+### Incident 5 & 6: Windows Persistence (Account Creation)
+**Context:** Creating a local user account provides "Persistence" (MITRE T1136) [5]. Even if the malware process is killed, the attacker can log back in using these credentials.
+* **Question:**  What is the name of the user created, and what groups were they assigned to? 
+*	**Investigative Methodology:**  I queried WinEventLog:Security for Event Code 4720 (User Created) and 4732 (Member Added to Security-Enabled Local Group). This two-step correlation is vital to understand the privilege level of the new account.
+   * **SPL Query:** 'index=botsv3 sourcetype="WinEventLog:Security" (EventCode=4720 OR EventCode=4732)'
+**Evidence:**
+<p align="center">
+  <img src="5.2.jpg" width="90%">
+  <br>
+  <em>Figure 8: Windows Security logs confirming the creation of the local svcvnc account.</em>
+</p>
+
+*	**Analysis & Finding :** 
+> ** User: svcvnc** 
+> ** Groups: Administrators, Users** 
+* **SOC & Strategic Reflection:** The username svcvnc strongly implies the installation of VNC (Virtual Network Computing) remote desktop software. Adding this user to "Administrators" grants total control.
+  
+*	**Operational Recommendation:** Implement a "Zero Trust" policy where local admin account creation triggers an automatic P1 alert to the SOC [6]. This activity should be blocked by Group Policy Object (GPO).
+  
