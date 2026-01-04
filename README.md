@@ -123,7 +123,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 
 * **Question:** What is the name of the malicious file sent to the user?
 * **Investigative Methodology:** I pivoted to the network stream data, specifically `stream:smtp`, to inspect email metadata. I filtered for attachments with the `.xlsm` extension (Excel Macro-Enabled Workbook) which are commonly used to drop payloads.
-    * **SPL Query:** `bash index=botsv3 sourcetype="stream:smtp" *.xlsm | table _time, sender, receiver, attach_filename`
+    * **SPL Query:** ` bash index=botsv3 sourcetype="stream:smtp" *.xlsm | table _time, sender, receiver, attach_filename`
 
 **Evidence:**
 <p align="center">
