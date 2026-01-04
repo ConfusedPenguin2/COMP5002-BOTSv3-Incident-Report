@@ -212,7 +212,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 
 **Evidence:**
 <p align="center">
-  <img src="evidence_q7_osquery.jpg" width="90%">
+  <img src="7.2.jpg" width="90%">
   <br>
   <em>Figure 11: Osquery results identifying the process ID listening on port 1337.</em>
 </p>
@@ -231,7 +231,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 
 **Evidence:**
 <p align="center">
-  <img src="evidence_q8_md5.jpg" width="90%">
+  <img src="8.2.jpg" width="90%">
   <br>
   <em>Figure 12: Sysmon logs identifying the C2 binary hdoor.exe and its network scanning arguments.</em>
 </p>
@@ -249,7 +249,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 To provide a clear path to improvement, we have analyzed the effectiveness of Frothly's current controls against the observed attack vectors. The chart below visualizes the current maturity gap.
 
 <p align="center">
-  <img src="figure12_maturity.jpg" width="80%">
+  <img src="frothly.jpg" width="80%">
   <br>
   <em>Figure 13: Security Control/Policy Analysis. Current controls are reactive, while proposed strategies move Frothly towards a proactive posture.</em>
 </p>
