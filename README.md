@@ -199,4 +199,67 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 * **SOC & Strategic Reflection:** The username svcvnc strongly implies the installation of VNC (Virtual Network Computing) remote desktop software. Adding this user to "Administrators" grants total control.
   
 *	**Operational Recommendation:** Implement a "Zero Trust" policy where local admin account creation triggers an automatic P1 alert to the SOC [6]. This activity should be blocked by Group Policy Object (GPO).
-  
+
+  ### Phase 3: Actions on Objectives (C2 & Lateral Movement)
+In the final phase, the attacker utilized their access to scan the network and establish Command and Control (C2).
+
+#### Incident 7: Command & Control (C2) Channel
+**Context:** C2 channels allow the attacker to send commands to the compromised host. The use of non-standard ports is a common evasion technique.
+
+* **Question:** What is the process ID of the process listening on a "leet" port?
+* **Investigative Methodology:** "Leet" refers to port 1337. I searched Osquery network connection logs for processes binding to this non-standard port.
+    * **SPL Query:** `index=botsv3 sourcetype="osquery:results" columns.local_port=1337`
+
+**Evidence:**
+<p align="center">
+  <img src="evidence_q7_osquery.jpg" width="90%">
+  <br>
+  <em>Figure 11: Osquery results identifying the process ID listening on port 1337.</em>
+</p>
+
+* **Analysis & Finding (Q7):** The Process ID (PID) is: **14356**. The process was identified as `netcat`, a classic tool for reverse shells often referred to as the "Swiss Army Knife" of hacking.
+
+* **SOC & Strategic Reflection:** Port 1337 should never be open on a production web server. The presence of `netcat` implies that IT staff may have left dangerous tools on the server ("Living off the Land" binary).
+    * **Operational Recommendation:** Firewall rules must be audited to ensure a "Default Deny" policy for ingress/egress traffic on non-standard ports.
+
+#### Incident 8: Internal Reconnaissance (Scanning)
+**Context:** Once inside, attackers "map" the network to find servers with valuable data (e.g., SQL databases). This corresponds to MITRE ATT&CK T1046 (Network Service Scanning) [5].
+
+* **Question:** What is the MD5 value of the file used to scan Frothly's network?
+* **Investigative Methodology:** I returned to Sysmon Event ID 1 logs, looking for processes executing from suspicious directories (Temp) with network arguments. Sysmon automatically calculates the hash of every executed process.
+    * **SPL Query:** `index=botsv3 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" EventCode=1 Image="*\Temp\*"`
+
+**Evidence:**
+<p align="center">
+  <img src="evidence_q8_md5.jpg" width="90%">
+  <br>
+  <em>Figure 12: Sysmon logs identifying the C2 binary hdoor.exe and its network scanning arguments.</em>
+</p>
+
+* **Analysis & Finding (Q8):** The file `hdoor.exe` was used to scan the IP range 192.168.1.1-255. The MD5 hash is: **586EF5BF4D8963DD546163AC31C86507**
+
+* **SOC & Strategic Reflection:** The execution of unsigned binaries from `C:\Windows\Temp` is a massive red flag. Temp folders are often world-writable, making them a favorite dropping point for malware.
+    * **Operational Recommendation:** Application Whitelisting (e.g., AppLocker) would have blocked this file execution entirely, regardless of the antivirus signature database.
+
+---
+
+## 5.0 Strategic Analysis & Recommendations
+
+### 5.1 SOC Maturity Assessment
+To provide a clear path to improvement, we have analyzed the effectiveness of Frothly's current controls against the observed attack vectors. The chart below visualizes the current maturity gap.
+
+<p align="center">
+  <img src="figure12_maturity.jpg" width="80%">
+  <br>
+  <em>Figure 13: Security Control/Policy Analysis. Current controls are reactive, while proposed strategies move Frothly towards a proactive posture.</em>
+</p>
+
+### 5.2 Critical Comparison of Current vs. Target State
+To demonstrate strategic improvement, the following table compares Frothly's current posture against the recommended target state.
+
+| Security Control | Current State (Observed in BOTSv3) | Target State (Strategic Recommendation) |
+| :--- | :--- | :--- |
+| **Email Filtering** | Allowed `.xlsm` macros from external sources. | **Block all external macros.** Implement "SafeLinks" to detonate attachments in a sandbox before delivery. |
+| **Endpoint Protection** | Reactive. Relied on antivirus signatures (Symantec). | **Proactive.** Enforce AppLocker (Allowlist) to block unsigned binaries like `hdoor.exe` in Temp folders. |
+| **Identity Management** | Local Admin accounts (`svcvnc`) created without alerts. | **Just-In-Time (JIT) Admin Access.** Any local admin creation triggers a P1 SOC alert. |
+| **Network Visibility** | Flat network. Workstations scanned servers (192.168.X.X). | **Micro-segmentation.** Workstations should be isolated from Server VLANs using Zero Trust ACLs [6]. |
