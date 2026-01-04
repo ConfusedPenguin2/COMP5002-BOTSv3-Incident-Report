@@ -252,7 +252,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 To provide a clear path to improvement, we have analyzed the effectiveness of Frothly's current controls against the observed attack vectors. The chart below visualizes the current maturity gap.
 
 <p align="center">
-  <img src="frothly.jpg" width="80%">
+  <img src="frothly.png" width="80%">
   <br>
   <em>Figure 13: Security Control/Policy Analysis. Current controls are reactive, while proposed strategies move Frothly towards a proactive posture.</em>
 </p>
