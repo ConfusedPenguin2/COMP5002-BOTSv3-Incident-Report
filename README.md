@@ -56,7 +56,7 @@ In a mature SOC, responsibilities are stratified. While Tier 1 analysts focus on
 * **Contextualization:** Understanding the business impact of the assets involved (e.g., Finance Department documents).
 * **Threat Hunting:** Proactively searching for "unknown unknowns," such as the anomalous User Agent string identified in Question 1, which had not triggered a default alert.
 <p align="center">
-  <img src="killchain.png" width="590%">
+  <img src="killchain.png" width="90%">
   <br>
   <p align="center">
   <em>Figure 3: The Cyber Kill Chain (Hutchins et al., 2011).</em>
@@ -112,8 +112,9 @@ A critical security deficiency in default Linux deployments is running services 
 I used the web interface on port 8000 to verify the indexer's operating status after installation. The successful login verifies that the web server is correctly binding to the local interface and that the splunkd background process is running.
 <p align="center">
   <img src="Fig7.png" width="90%">
-</p
-  <p> align="center">
+</p>
+
+  <p align="center">
   <img src="Fig8.png" width="90%">
   <br>
   <em>Figure 7: web interface and login of Splunk.</em>
