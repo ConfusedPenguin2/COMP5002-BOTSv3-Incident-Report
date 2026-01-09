@@ -147,7 +147,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 <p align="center">
   <img src="1.2.png" width="90%">
   <br>
-  <em>Figure 5: Splunk search results confirming the upload from a suspicious User Agent.</em>
+  <em>Figure 8: Splunk search results confirming the upload from a suspicious User Agent.</em>
 </p>
 
 * **Analysis & Finding (Q1):** The uploaded file was a malicious shortcut (`.lnk`). The User Agent string identified is:
@@ -166,7 +166,7 @@ The attack commenced with reconnaissance and staging of malware on trusted cloud
 <p align="center">
   <img src="2.2.jpg" width="90%">
   <br>
-  <em>Figure 6: SMTP logs capturing the delivery of the malicious financial document.</em>
+  <em>Figure 9: SMTP logs capturing the delivery of the malicious financial document.</em>
 </p>
 
 * **Analysis & Finding (Q2):** The logs confirm the delivery of a file named:
@@ -191,7 +191,7 @@ Once delivered, the attacker relied on user interaction to execute the payload.
 <p align="center">
   <img src="3.2.jpg" width="90%">
   <br>
-  <em>Figure 7: Sysmon Event ID 1 showing the execution of HxTsr.exe relative to the antivirus log.</em>
+  <em>Figure 10: Sysmon Event ID 1 showing the execution of HxTsr.exe relative to the antivirus log.</em>
 </p>
 
 * **Analysis & Finding (Q3):** The embedded executable is named:
@@ -211,7 +211,7 @@ Once delivered, the attacker relied on user interaction to execute the payload.
 <p align="center">
   <img src="4.2.jpg" width="90%">
   <br>
-  <em>Figure 8: Osquery results showing the creation of the backdoor user tomcat7.</em>
+  <em>Figure 11: Osquery results showing the creation of the backdoor user tomcat7.</em>
 </p>
 
 > * **Analysis & Finding (Q4):** The command exposed the password:
@@ -231,7 +231,7 @@ Once delivered, the attacker relied on user interaction to execute the payload.
 <p align="center">
   <img src="5.2.jpg" width="90%">
   <br>
-  <em>Figure 9: Windows Security logs confirming the creation of the local svcvnc account.</em>
+  <em>Figure 12: Windows Security logs confirming the creation of the local svcvnc account.</em>
 </p>
 
 * **Analysis & Finding (Q5/Q6):**
@@ -255,7 +255,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 <p align="center">
   <img src="7.2.jpg" width="90%">
   <br>
-  <em>Figure 11: Osquery results identifying the process ID listening on port 1337.</em>
+  <em>Figure 13: Osquery results identifying the process ID listening on port 1337.</em>
 </p>
 
 * **Analysis & Finding (Q7):** The Process ID (PID) is: **14356**. The process was identified as `netcat`, a classic tool for reverse shells often referred to as the "Swiss Army Knife" of hacking.
@@ -274,7 +274,7 @@ In the final phase, the attacker utilized their access to scan the network and e
 <p align="center">
   <img src="8.2.jpg" width="90%">
   <br>
-  <em>Figure 12: Sysmon logs identifying the C2 binary hdoor.exe and its network scanning arguments.</em>
+  <em>Figure 14: Sysmon logs identifying the C2 binary hdoor.exe and its network scanning arguments.</em>
 </p>
 
 * **Analysis & Finding (Q8):** The file `hdoor.exe` was used to scan the IP range 192.168.1.1-255. The MD5 hash is: **586EF5BF4D8963DD546163AC31C86507**
@@ -292,7 +292,7 @@ To provide a clear path to improvement, we have analyzed the effectiveness of Fr
 <p align="center">
   <img src="frothly.png" width="80%">
   <br>
-  <em>Figure 13: Security Control/Policy Analysis. Current controls are reactive, while proposed strategies move Frothly towards a proactive posture.</em>
+  <em>Figure 15: Security Control/Policy Analysis. Current controls are reactive, while proposed strategies move Frothly towards a proactive posture.</em>
 </p>
 
 ### 5.2 Critical Comparison of Current vs. Target State
@@ -325,7 +325,7 @@ The presence of a North Korean User Agent (`NaenaraBrowser`) went unnoticed unti
 <p align="center">
   <img src="pyramid.jpg" width="60%">
   <br>
-  <em>Figure 14: The Pyramid of Pain (Bianco, 2013)</em>
+  <em>Figure 16: The Pyramid of Pain (Bianco, 2013)</em>
 </p>
 
 ---
