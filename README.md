@@ -74,14 +74,51 @@ A critical part of Tier 2 analysis is understanding visibility gaps. The followi
 | **C2** | `Osquery` | **High** | Provided granular visibility into specific ports (1337) and process bindings on Linux, superior to standard netstat logs. |
 
 ## 3.0 Installation & Data Preparation
-*Analyst Note: This section validates the integrity of the forensic environment.*
 
 ### 3.1 Infrastructure Configuration
-The investigation was conducted on a localized Splunk Enterprise instance hosted on an Ubuntu 20.04 Virtual Machine.
+installed Splunk Enterprise 10.x on a virtual Kali Linux system that has been hardened. I followed Linux standard base (LSB) compliance for service management by using the Debian package installer (dpkg) to provide a consistent installation path (/opt/splunk).
+<p align="center">
+  <img src="Fig4.png",width="90%">
+  <br>
+  <p align="center">
+  <em>Figure 4: Deployment of Splunk Enterprise in kali</em>
+</p>
+</p>
 
-* **Ingestion Strategy:** The BOTSv3 dataset [4] was ingested using the standard Splunk "Add Data" workflow. Special attention was paid to the `sourcetype` configuration to ensure correct field extraction. For instance, ensuring `xmlwineventlog:microsoft-windows-sysmon/operational` was correctly parsed was critical for extracting the MD5 hashes required in Question 8.
-* **Validation:** A baseline query `index=botsv3 | stats count by sourcetype` was executed to verify that log volume matched expected parameters (approx. X million events), ensuring no data loss occurred during ingestion.
+## 3.2 Data Supply Chain & Integrity 
+The investigation data was not drag-and-dropped but retrieved directly from the source to maintain the chain of custody.
+*	**Ingestion:** I used wget to pull the dataset from the official AWS repository.
+* **Justification:** Using command-line tools like wget and tar minimizes the risk of file corruption that can occur with GUI-based transfers, preserving the timestamps of the original log artifacts.
 
+<p align="center">
+  <img src="Fig5.png" width="90%">
+  <br>
+  <em>Figure 5: Secure ingestion of the BOTSv3 dataset using wget.</em>
+</p>
+
+## 3.3 Infrastructure Hardening (Least Privilege) 
+The investigation data was not drag-and-dropped but retrieved directly from the source to maintain the chain of custody.
+A critical security deficiency in default Linux deployments is running services as root. To mitigate this "Privilege Escalation" risk, I explicitly modified the file ownership of the ingested data.
+* **Action:** Executed chown -R splunk:splunk on the BOTSv3 directory.
+* **Result:** This ensures the Splunk daemon runs as a non-privileged user (splunk) while still maintaining read-access to the evidence, aligning with the Principle of Least Privilege.
+
+<p align="center">
+  <img src="Fig6.png" width="90%">
+  <br>
+  <em>Figure 6: Implementation of the "Principle of Least Privilege.</em>
+</p>
+
+## 3.4 Validation of Services 
+I used the web interface on port 8000 to verify the indexer's operating status after installation. The successful login verifies that the web server is correctly binding to the local interface and that the splunkd background process is running.
+<p align="center">
+  <img src="Fig7.png" width="90%">
+</p
+  <p align="center">
+  <img src="Fig8.png" width="90%">
+  <br>
+  <em>Figure 7: web interface and login of Splunk.</em>
+  </p>
+   
 ## 4.0 Guided Questions: Comprehensive Incident Analysis
 
 ### Reconstructed Attack Timeline
