@@ -113,7 +113,7 @@ I used the web interface on port 8000 to verify the indexer's operating status a
 <p align="center">
   <img src="Fig7.png" width="90%">
 </p
-  <p align="center">
+  <p> align="center">
   <img src="Fig8.png" width="90%">
   <br>
   <em>Figure 7: web interface and login of Splunk.</em>
